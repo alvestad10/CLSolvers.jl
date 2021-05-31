@@ -69,13 +69,13 @@ discContour = discretizeContour(contour,2t_steps/5,2t_steps/5,t_steps/5)
 
 # Get usefull parameters for simulation and plotting
 begin
-    a = getContourDistances(discContour, contour)
-    CC = getContour(discContour, contour)
-    tp = CLSolvers.spread_timepoints(discContour,contour)
+    a = getContourDistances(discContour, contour) # Points separation
+    CC = getContour(discContour, contour)         # Contour points (Complex numbers)
+    tp = CLSolvers.spread_timepoints(discContour,contour) # Parameterization points
 end
 
 # Plot contour to be safe
-fig = CLSolvers.scatter(CC,legend=false,xlim=[0,1])
+fig = CLSolvers.scatter(CC,legend=false)
 #CLSolvers.scatter(a)
 
 
@@ -122,8 +122,7 @@ end
             progress = true, saveat = 0.01, save_start = false, 
             dtmax=args.dtmax, dt=args.dt,
             adaptive=args.adaptive,
-            abstol=args.tol,reltol=args.tol,maxiter=BigInt(10)^18)
-
+            abstol=args.tol,reltol=args.tol,maxiter=10^6)
 end
 
 
