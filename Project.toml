@@ -1,4 +1,4 @@
-name = "CLSolver"
+name = "CLSolvers"
 uuid = "6604eb69-d7d4-4c9c-bacc-f4c87c09b924"
 authors = ["alvestad10"]
 version = "0.1.0"

@@ -13,7 +13,6 @@ using DocStringExtensions
 
 
 include("model.jl")
-include("scheme.jl")
 include("contour.jl")
 include("contourDiscretization.jl")
 include("analysis.jl")

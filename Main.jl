@@ -1,4 +1,3 @@
-#include("src/CLSolvers.jl")
 using CLSolvers
 using DifferentialEquations, StochasticDiffEq
 using Random
@@ -50,8 +49,8 @@ discContour = discretizeContour(contour,t_steps)
 
 # script to distribute equally in a tilted contour
 begin
-    L1 = CLSolver.L1(contour)/CLSolver.T(contour)
-    L2 = CLSolver.L2(contour)/CLSolver.T(contour)
+    L1 = CLSolvers.L1(contour)/CLSolvers.T(contour)
+    L2 = CLSolvers.L2(contour)/CLSolvers.T(contour)
 
     t_step1 = ceil(Int64,t_steps*L1)
     t_step2 = floor(Int64,t_steps*L2)
@@ -72,12 +71,12 @@ discContour = discretizeContour(contour,2t_steps/5,2t_steps/5,t_steps/5)
 begin
     a = getContourDistances(discContour, contour)
     CC = getContour(discContour, contour)
-    tp = CLSolver.spread_timepoints(discContour,contour)
+    tp = CLSolvers.spread_timepoints(discContour,contour)
 end
 
 # Plot contour to be safe
-fig = CLSolver.scatter(CC,legend=false,xlim=[0,1])
-#CLSolver.scatter(a)
+fig = CLSolvers.scatter(CC,legend=false,xlim=[0,1])
+#CLSolvers.scatter(a)
 
 
 ################################
@@ -101,7 +100,7 @@ end
 args = (N_Tr = 50, θ = 1.0, dt = 1e-4, tol = 5e-2, dtmax = 1e-3, tspan=(0.0,10.0), adaptive=false)
 begin
 params = getParamArray(p,a)
-sde_a, sde_b, _ = CLSolver.get_sde_funcs(p)
+sde_a, sde_b, _ = CLSolvers.get_sde_funcs(p)
 
 ff = SDEFunction(sde_a,sde_b)
 prob_sde2 = SDEProblem(ff,sde_b,y0,args.tspan,params)
@@ -171,7 +170,7 @@ filename = "filename1" # Set the filename to the file be saved/loaded
 
 # Save solution + all information needed to continue simulating or plotting observables
 begin
-    CLSolver.save_sol(string("results/",filename,".jld"),sol, p, contour, a, CC, tp)
+    CLSolvers.save_sol(string("results/",filename,".jld"),sol, p, contour, a, CC, tp)
 end
 
 # Load solution etc.
