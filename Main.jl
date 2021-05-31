@@ -26,7 +26,7 @@ p = AHO_Param(1,1,24)
 #contour = EucledianContour(1.0)
 #contour = NonEquilTiltedSchwingerKeldyshContour(1.0,0.0001)
 #contour = NonEquilSchwingerKeldyshContour(0.5,0.0)
-contour = SchwingerKeldyshContour(1.0,0.8,0.0,1.0)
+contour = SchwingerKeldyshContour(1.0,0.5,0.0,0.0)
 #contour = SchwingerKeldyshContourRounded1(1.0,0.6,0.5,0.005,0.0025)
 #contour = SchwingerKeldyshContourRounded2(1.0,0.6,0.25,0.1,0.025,0.05)
 #contour = SchwingerKeldyshContourRounded3(1.0,0.6,0.25,0.4,0.1,0.15,0.02)
@@ -97,7 +97,7 @@ end
 ######################
 # RUN THE SIMULATION #
 ######################
-args = (N_Tr = 50, θ = 1.0, dt = 1e-4, tol = 5e-2, dtmax = 1e-3, tspan=(0.0,10.0), adaptive=false)
+args = (N_Tr = 50, θ = 0.6, dt = 1e-4, tol = 5e-2, dtmax = 1e-3, tspan=(0.0,10.0), adaptive=true)
 begin
 params = getParamArray(p,a)
 sde_a, sde_b, _ = CLSolvers.get_sde_funcs(p)
@@ -140,7 +140,7 @@ avg_Re, avg_Im, avg2_Re, avg2_Im, corr0t_Re, corr0t_Im, corr0t_2_Re, corr0t_2_Im
 #######################
 ## Plotting functions #
 #######################
-plot_realtime_corr0t(corr0t_Re, corr0t_Im, CC; true_solution=dfScroSolMinkBeta1, save=false,fig_name="realtime_corrx0xt_longRealtime_15")
+plot_realtime_corr0t(corr0t_Re, corr0t_Im, CC; true_solution=dfScroSolMinkBeta1)
 
 plot_full_corr0t(corr0t_Re, corr0t_Im, CC; true_solution=dfScroSolMinkBeta1, save=false, fig_name="thermal_corrx0xt")
 plot_full_corr0t_corrt0(corr0t_Re, corr0t_Im, corr0t_2_Re, corr0t_2_Im, corrt0_Re, corrt0_Im, CC; true_solution=dfScroSolMinkNonEquil, save=false,fig_name="thermal_G+-_G-+")
