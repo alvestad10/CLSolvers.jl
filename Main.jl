@@ -133,21 +133,39 @@ check_errors(sol,remove_warning_tr=true)
 ##########################
 ## CALCULATE OBSERVABLES #
 ##########################
-avg_Re, avg_Im, avg2_Re, avg2_Im, corr0t_Re, corr0t_Im, corr0t_2_Re, corr0t_2_Im, corrt0_Re, corrt0_Im = get_statistics(sol)
-
+avg_Re, avg_Im, avg2_Re, avg2_Im, corr0t_Re, corr0t_Im, Gpm_Re, Gpm_Im, Gmp_Re, Gmp_Im = get_statistics(sol, thermal=32)
+# (thermal argument should correspond to the last point in the real-time axes to use the Gpm and Gmp correlators)
 
 #######################
 ## Plotting functions #
 #######################
+# The properties of the plot can be changed in the src/plot_observables.jl file
+# ex. you can set the legend position here
+
+####
+# Thermal
+
+# <ϕ(0)ϕ(t)> correlators
 plot_realtime_corr0t(corr0t_Re, corr0t_Im, CC; true_solution=dfScroSolMinkBeta1)
+plot_full_corr0t(corr0t_Re, corr0t_Im, CC; true_solution=dfScroSolMinkBeta1)
 
-plot_full_corr0t(corr0t_Re, corr0t_Im, CC; true_solution=dfScroSolMinkBeta1, save=false, fig_name="thermal_corrx0xt")
-plot_full_corr0t_corrt0(corr0t_Re, corr0t_Im, corr0t_2_Re, corr0t_2_Im, corrt0_Re, corrt0_Im, CC; true_solution=dfScroSolMinkNonEquil, save=false,fig_name="thermal_G+-_G-+")
+# <ϕ_+(0)ϕ_-(t)> and <ϕ_-(0)ϕ_+(t)> correlators
+plot_Gpm_Gmp(Gpm_Re, Gpm_Im, Gmp_Re, Gmp_Im, CC; true_solution=dfScroSolMinkBeta1)
 
-plot_full_avg_realtime(avg_Re, avg_Im, CC; true_solution=dfScroSolMinkNonEquil)
-plot_eucledian_corr0t(corr0t_Re, corr0t_Im, CC[1:end-1]; true_solution=dfScroSolEuclBeta1, save=true, fig_name="eucledian_corrx0xt_noTilt")
-plot_eucledian_avg(avg_Re,avg_Im,avg2_Re,avg2_Im,tp[1:end-1]; true_solution=dfScroSolMinkBeta1,save=true,fig_name="tparam_x_x2_thermal")
-plot_eucledian_avg_nonEquil(avg_Re,avg_Im,avg2_Re,avg2_Im,CC[1:end]; true_solution=dfScroSolMinkNonEquil,save=false,fig_name="tparam_x_x2_nonEquil")
+# Plot corr0t along the Eucledian part of the contour
+plot_eucledian_corr0t(corr0t_Re, corr0t_Im, CC[1:end-1]; true_solution=dfScroSolEuclBeta1)
+
+# plot <x> and <x^2>
+plot_avg_avg2(avg_Re,avg_Im,avg2_Re,avg2_Im,tp[1:end-1]; true_solution=dfScroSolMinkBeta1)
+
+#####
+# Non-Equilibrium
+
+# <ϕ(0)ϕ(t)>
+plot_full_corr0t(corr0t_Re, corr0t_Im, CC; true_solution=dfScroSolMinkNonEquil)
+
+# plot <x> and <x^2>
+plot_avg_avg2_nonEquil(avg_Re,avg_Im,avg2_Re,avg2_Im,CC; true_solution=dfScroSolMinkNonEquil)
 
 
 

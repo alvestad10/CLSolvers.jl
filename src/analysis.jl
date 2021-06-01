@@ -117,13 +117,10 @@ function get_statistics(sol;TT=1,therm=1,thermal = 0)
     avg2_Im = zeros(Float64,N_Tr,t_steps)
     corr0t_Re = zeros(Float64,N_Tr,t_steps)
     corr0t_Im = zeros(Float64,N_Tr,t_steps)
-    corr0t_2_Re = zeros(Float64,N_Tr,t_steps)
-    corr0t_2_Im = zeros(Float64,N_Tr,t_steps)
-    corrt0_Re = zeros(Float64,N_Tr,t_steps)
-    corrt0_Im = zeros(Float64,N_Tr,t_steps)
-
-    #twoPoint_Re = zeros(Float64,N_Tr,t_steps,t_steps)
-    #twoPoint_Im = zeros(Float64,N_Tr,t_steps,t_steps)
+    Gpm_Re = zeros(Float64,N_Tr,t_steps)
+    Gpm_Im = zeros(Float64,N_Tr,t_steps)
+    Gmp_Re = zeros(Float64,N_Tr,t_steps)
+    Gmp_Im = zeros(Float64,N_Tr,t_steps)
 
     
 
@@ -144,29 +141,20 @@ function get_statistics(sol;TT=1,therm=1,thermal = 0)
             corr0t_Im_tmp =  SMu[1,:] .* SMu[t_steps+i,:] .+ SMu[i,:] .* SMu[t_steps+1,:] 
             corr0t_Im[tr,i] = mean(corr0t_Im_tmp)
 
-            corr0t_2_Re_tmp = SMu[1,:] .* SMu[t_steps-i-thermal+1,:] .- SMu[t_steps+1,:] .* SMu[2*t_steps-i-thermal+1,:] 
-            corr0t_2_Re[tr,i] = mean(corr0t_2_Re_tmp)
+            Gpm_Re_tmp = SMu[1,:] .* SMu[t_steps-i-thermal+1,:] .- SMu[t_steps+1,:] .* SMu[2*t_steps-i-thermal+1,:] 
+            Gpm_Re[tr,i] = mean(Gpm_Re_tmp)
         
-            corr0t_2_Im_tmp =  SMu[1,:] .* SMu[2t_steps-i-thermal+1,:] .+ SMu[t_steps-i-thermal+1,:] .* SMu[t_steps+1,:] 
-            corr0t_2_Im[tr,i] = mean(corr0t_2_Im_tmp)
+            Gpm_Im_tmp =  SMu[1,:] .* SMu[2t_steps-i-thermal+1,:] .+ SMu[t_steps-i-thermal+1,:] .* SMu[t_steps+1,:] 
+            Gpm_Im[tr,i] = mean(Gpm_Im_tmp)
 
-            corrt0_Re_tmp = SMu[t_steps-thermal,:] .* SMu[i,:] .- SMu[2*t_steps-thermal,:] .* SMu[t_steps+i,:] 
-            corrt0_Re[tr,i] = mean(corrt0_Re_tmp)
+            Gmp_Re_tmp = SMu[t_steps-thermal,:] .* SMu[i,:] .- SMu[2*t_steps-thermal,:] .* SMu[t_steps+i,:] 
+            Gmp_Re[tr,i] = mean(Gmp_Re_tmp)
 
-            corrt0_Im_tmp =  SMu[t_steps-thermal,:] .* SMu[t_steps+i,:] .+ SMu[i,:] .* SMu[2*t_steps-thermal,:] 
-            corrt0_Im[tr,i] = mean(corrt0_Im_tmp)
+            Gmp_Im_tmp =  SMu[t_steps-thermal,:] .* SMu[t_steps+i,:] .+ SMu[i,:] .* SMu[2*t_steps-thermal,:] 
+            Gmp_Im[tr,i] = mean(Gmp_Im_tmp)
 
-            #for j in 1:t_steps
-            #    twoPoint_Re_tmp = SMu[j,:] .* SMu[i,:] .- SMu[t_steps+j,:] .* SMu[t_steps+i,:] 
-            #    twoPoint_Re[tr,j,i] = mean(twoPoint_Re_tmp)
-        
-            #    twoPoint_Im_tmp =  SMu[j,:] .* SMu[t_steps+i,:] .+ SMu[i,:] .* SMu[t_steps+j,:] 
-            #    twoPoint_Im[tr,j,i] = mean(twoPoint_Im_tmp)
-            #end
         end
     end
-
-    #display(histogram(reshape(avg2_Im[:,:],:,1),bins=200,normalize=true))
 
     d = 1
     
@@ -177,12 +165,10 @@ function get_statistics(sol;TT=1,therm=1,thermal = 0)
     avg2_Im_bts = bootstrap(mean_d, avg2_Im, BalancedSampling(n_boot))
     corr0t_Re_bts = bootstrap(mean_d, corr0t_Re, BalancedSampling(n_boot))
     corr0t_Im_bts = bootstrap(mean_d, corr0t_Im, BalancedSampling(n_boot))
-    corr0t_2_Re_bts = bootstrap(mean_d, corr0t_2_Re, BalancedSampling(n_boot))
-    corr0t_2_Im_bts = bootstrap(mean_d, corr0t_2_Im, BalancedSampling(n_boot))
-    corrt0_Re_bts = bootstrap(mean_d, corrt0_Re, BalancedSampling(n_boot))
-    corrt0_Im_bts = bootstrap(mean_d, corrt0_Im, BalancedSampling(n_boot))
-    #twoPoint_Re_bts = bootstrap(mean_d, twoPoint_Re, BalancedSampling(n_boot))
-    #twoPoint_Im_bts = bootstrap(mean_d, twoPoint_Im, BalancedSampling(n_boot))
+    Gpm_Re_bts = bootstrap(mean_d, Gpm_Re, BalancedSampling(n_boot))
+    Gpm_Im_bts = bootstrap(mean_d, Gpm_Im, BalancedSampling(n_boot))
+    Gmp_Re_bts = bootstrap(mean_d, Gmp_Re, BalancedSampling(n_boot))
+    Gmp_Im_bts = bootstrap(mean_d, Gmp_Im, BalancedSampling(n_boot))
 
     std_err(x) = std(x,dims=d,corrected=true) ./ sqrt(size(x)[2])
     avg_Re_bts_std = bootstrap(std_err, avg_Re, BalancedSampling(n_boot))
@@ -191,36 +177,23 @@ function get_statistics(sol;TT=1,therm=1,thermal = 0)
     avg2_Im_bts_std = bootstrap(std_err, avg2_Im, BalancedSampling(n_boot))
     corr0t_Re_bts_std = bootstrap(std_err, corr0t_Re, BalancedSampling(n_boot))
     corr0t_Im_bts_std = bootstrap(std_err, corr0t_Im, BalancedSampling(n_boot))
-    corr0t_2_Re_bts_std = bootstrap(std_err, corr0t_2_Re, BalancedSampling(n_boot))
-    corr0t_2_Im_bts_std = bootstrap(std_err, corr0t_2_Im, BalancedSampling(n_boot))
-    corrt0_Re_bts_std = bootstrap(std_err, corrt0_Re, BalancedSampling(n_boot))
-    corrt0_Im_bts_std = bootstrap(std_err, corrt0_Im, BalancedSampling(n_boot))
-    #twoPoint_Re_bts_std = bootstrap(std_err, twoPoint_Re, BalancedSampling(n_boot))
-    #twoPoint_Im_bts_std = bootstrap(std_err, twoPoint_Im, BalancedSampling(n_boot))
-    
+    Gpm_Re_bts_std = bootstrap(std_err, Gpm_Re, BalancedSampling(n_boot))
+    Gpm_Im_bts_std = bootstrap(std_err, Gpm_Im, BalancedSampling(n_boot))
+    Gmp_Re_bts_std = bootstrap(std_err, Gmp_Re, BalancedSampling(n_boot))
+    Gmp_Im_bts_std = bootstrap(std_err, Gmp_Im, BalancedSampling(n_boot))
+
     avg_Re = collect(original(avg_Re_bts)) .± original(avg_Re_bts_std)
     avg_Im = collect(original(avg_Im_bts)) .± original(avg_Im_bts_std)
     avg2_Re = collect(original(avg2_Re_bts)) .± (original(avg2_Re_bts_std))
-    avg2_Im = collect(original(avg2_Im_bts)) .± original(avg_Im_bts_std)
+    avg2_Im = collect(original(avg2_Im_bts)) .± original(avg2_Im_bts_std)
     corr0t_Re = (collect(original(corr0t_Re_bts)) .± original(corr0t_Re_bts_std)) .- avg_Re.*avg_Re[1]
     corr0t_Im = (collect(original(corr0t_Im_bts)) .± original(corr0t_Im_bts_std)) .- avg_Im.*avg_Im[1]
-    corr0t_2_Re = (collect(original(corr0t_2_Re_bts)) .± original(corr0t_2_Re_bts_std)) .- avg_Re.*avg_Re[1]
-    corr0t_2_Im = (collect(original(corr0t_2_Im_bts)) .± original(corr0t_2_Im_bts_std)) .- avg_Im.*avg_Im[1]
-    corrt0_Re = (collect(original(corrt0_Re_bts)) .± original(corrt0_Re_bts_std)) .- avg_Re.*avg_Re[t_steps]
-    corrt0_Im = (collect(original(corrt0_Im_bts)) .± original(corrt0_Im_bts_std)) .- avg_Im.*avg_Im[t_steps]
+    Gpm_Re = (collect(original(Gpm_Re_bts)) .± original(Gpm_Re_bts_std)) .- avg_Re.*avg_Re[1]
+    Gpm_Im = (collect(original(Gpm_Im_bts)) .± original(Gpm_Im_bts_std)) .- avg_Im.*avg_Im[1]
+    Gmp_Re = (collect(original(Gmp_Re_bts)) .± original(Gmp_Re_bts_std)) .- avg_Re.*avg_Re[t_steps]
+    Gmp_Im = (collect(original(Gmp_Im_bts)) .± original(Gmp_Im_bts_std)) .- avg_Im.*avg_Im[t_steps]
     
-    #subtracting_avgs_Re = zeros(Measurement{Float64},t_steps,t_steps)
-    #subtracting_avgs_Im = zeros(Measurement{Float64},t_steps,t_steps)
-    #for j in 1:t_steps
-    #    subtracting_avgs_Re[j,:] = avg_Re.*avg_Re[j]
-    #    subtracting_avgs_Im[j,:] = avg_Im.*avg_Im[j]
-    #end
-    #println(size(collect(original(twoPoint_Re_bts)) .± original(twoPoint_Re_bts_std)))
-    #println(size(subtracting_avgs_Re))
-    #twoPoint_Re = reshape((collect(original(twoPoint_Re_bts)) .± original(twoPoint_Re_bts_std)),(t_steps,t_steps)) .- subtracting_avgs_Re
-    #twoPoint_Im = reshape((collect(original(twoPoint_Im_bts)) .± original(twoPoint_Im_bts_std)),(t_steps,t_steps)) .- subtracting_avgs_Im
-
-    return avg_Re, avg_Im, avg2_Re, avg2_Im, corr0t_Re, corr0t_Im, corr0t_2_Re, corr0t_2_Im, corrt0_Re, corrt0_Im  #twoPoint_Re, twoPoint_Im
+    return avg_Re, avg_Im, avg2_Re, avg2_Im, corr0t_Re, corr0t_Im, Gpm_Re, Gpm_Im, Gmp_Re, Gmp_Im  #twoPoint_Re, twoPoint_Im
     
 end
 

@@ -1,5 +1,7 @@
-export plot_realtime_corr0t,plot_realtime_corr0t!, plot_full_corr0t, plot_full_corr0t_corrt0, plot_full_avg_realtime,
-       plot_eucledian_corr0t, plot_t_param_corr0t, plot_eucledian_avg, plot_eucledian_avg_nonEquil, plot_corrections
+export plot_realtime_corr0t,plot_realtime_corr0t!, plot_full_corr0t,
+       plot_Gpm_Gmp, plot_eucledian_corr0t, plot_xi_param_corr0t,
+       plot_avg_avg2, plot_avg_avg2_nonEquil, 
+       plot_corrections, plot_avg2_with_corrections
 
 ####################################################
 
@@ -28,18 +30,17 @@ markers_dict(color,markershape) = Dict(
 markers_dict(color) = markers_dict(color,:square) 
 
 solution_line_dict = Dict(:color => "black",:lw => SOL_LW)
- 
+
+color_1 = 1
+color_2 = 2
+color_3 = "black"
+color_4 = 3
  
  
 ## PLOT Real-Time CORR0T
 function plot_realtime_corr0t(corr0t_Re, corr0t_Im, CC;
         true_solution=0,true_solution2=0,label="",theta=0.1,
         save=false,fig_name="realtime_corrx0xt")
-
-    color_1 = 1
-    color_2 = 2
-    color_3 = "black"
-    color_4 = 3
 
     x = real(CC)
     tpmax = argmax(x)
@@ -71,10 +72,6 @@ function plot_realtime_corr0t(corr0t_Re, corr0t_Im, CC;
 end
 
 function plot_realtime_corr0t!(fig,corr0t_Re, corr0t_Im, CC; label="",theta=0.1)
-    color_1 = 1
-    color_2 = 2
-    color_3 = "black"
-    color_4 = 3
     x = real(CC)
     tpmax = argmax(x)
 
@@ -86,14 +83,10 @@ end
 
 ## PLOT Eucledian CORR0T
 function plot_full_corr0t(corr0t_Re, corr0t_Im, CC;
-    true_solution=0,label="",theta=0.1,
+    true_solution=0,label="",
     save=false,fig_name="realtime_corrx0xt0t_full")
     x = real(CC)
     tpmax = argmax(x)
-
-    color_1 = floor(Int,theta*10)
-    color_2 = floor(Int,theta*20)
-    color_3 = "black"
 
 
     fig = plot(xlabel = L"$\xi$",
@@ -133,8 +126,8 @@ function plot_full_corr0t(corr0t_Re, corr0t_Im, CC;
 end
 
 ## PLOT Eucledian CORR0T
-function plot_full_Gpm_Gmp(Gpm_Re, Gpm_Im, Gmp_Re, Gmp_Im, CC;
-    true_solution=0,label="",theta=0.1,
+function plot_Gpm_Gmp(Gpm_Re, Gpm_Im, Gmp_Re, Gmp_Im, CC;
+    true_solution=0,label="",
     save=false,fig_name="realtime_corrx0xt0t_full")
     
     x = real(CC)
@@ -169,88 +162,9 @@ function plot_full_Gpm_Gmp(Gpm_Re, Gpm_Im, Gmp_Re, Gmp_Im, CC;
 end
 
 
-
-
-## PLOT Eucledian CORR0T
-function plot_full_avg_realtime(avg_Re, avg_Im, CC;
-          true_solution=0,true_solution2=0,true_solution3=0,label="",theta=0.1,
-          save=false,fig_name="realtime_xt_full")
-    x = real(CC)
-    tpmax = argmax(x)
-
-    color_1 = 1
-    color_2 = 2
-    color_3 = "black"
-    color_4 = 3
-    color_5 = 4
-
-
-    fig = plot(xlabel=L"$t$",ylabel=L"$\langle \phi(t) \rangle$",
-    legend=:inside, foreground_color_legend=:white,
-    framestyle = :box,thickness_scaling = 1.5)
-
-
-    if true_solution != 0
-        tmax_inx = argmin(abs.(true_solution["x"] .- maximum(x[1:tpmax])))
-        plot!(fig,true_solution["x"][1:tmax_inx],true_solution["avgRe"][1:tmax_inx],label=L"\textrm{Solution}",color=color_3,lw=SOL_LW)
-        plot!(fig,true_solution["x"][1:tmax_inx],true_solution["avgIm"][1:tmax_inx],label=false,color=color_3,lw=SOL_LW)
-
-        plot!(fig,true_solution["x"][tmax_inx] .+ true_solution["x"][1:tmax_inx],
-        reverse(true_solution["avgRe"][1:tmax_inx]),label=false,color=color_3,lw=SOL_LW)
-        plot!(fig,true_solution["x"][tmax_inx] .+ true_solution["x"][1:tmax_inx],
-        reverse(true_solution["avgIm"][1:tmax_inx]),label=false,color=color_3,lw=SOL_LW)
-    end
-
-    if true_solution2 != 0
-        tmax_inx = argmin(abs.(true_solution2["x"] .- maximum(x[1:tpmax])))
-        plot!(fig,true_solution2["x"][1:tmax_inx],true_solution2["avgRe"][1:tmax_inx],label="BergeSixty RealSol",color=color_4)
-        plot!(fig,true_solution2["x"][1:tmax_inx],true_solution2["avgIm"][1:tmax_inx],label="ScroSol Im",color=color_4)
-
-        plot!(fig,x[tpmax] .+ reverse(x[tpmax].-true_solution2["x"][1:tmax_inx]),
-        reverse(true_solution2["avgRe"][1:tmax_inx]),label=false,color=color_4)
-        plot!(fig,x[tpmax] .+ reverse(x[tpmax].-true_solution2["x"][1:tmax_inx]),
-        reverse(true_solution2["avgIm"][1:tmax_inx]),label=false,color=color_4)
-    end
-
-    if true_solution3 != 0
-        tmax_inx = argmin(abs.(true_solution3["x"] .- maximum(x[1:tpmax])))
-        plot!(fig,true_solution3["x"][1:tmax_inx],true_solution3["avgRe"][1:tmax_inx],label="BergeSixty ComplexSol",color=color_5)
-        plot!(fig,true_solution3["x"][1:tmax_inx],true_solution3["avgIm"][1:tmax_inx],label="ScroSol Im",color=color_5)
-
-        plot!(fig,x[tpmax] .+ reverse(x[tpmax].-true_solution3["x"][1:tmax_inx]),
-        reverse(true_solution3["avgRe"][1:tmax_inx]),label=false,color=color_5)
-        plot!(fig,x[tpmax] .+ reverse(x[tpmax].-true_solution3["x"][1:tmax_inx]),
-        reverse(true_solution3["avgIm"][1:tmax_inx]),label=false,color=color_5)
-    end
-
-    # Forward
-    fw_interval = 1:tpmax
-    plot!(fig,x[fw_interval],avg_Re[fw_interval],
-    label= (label=="" ? L"$\textrm{Re}\langle \phi(t) \rangle$" : label),color=color_1, markershape=:square,markerstrokecolor = color_1 ,lw=0.0,markersize=M_SIZE)
-    plot!(fig,x[fw_interval],avg_Im[fw_interval],
-    label= (label=="" ? L"$\textrm{Im}\langle \phi(t) \rangle$" : label),color=color_2, markershape=:square,markerstrokecolor = color_2,lw=0.0,markersize=M_SIZE)
-
-
-    # Backward
-    bw_interval = tpmax+1:2*tpmax-1
-    plot!(fig,x[tpmax] .+ (x[tpmax] .- x[bw_interval]),avg_Re[bw_interval],
-    label= false,color=color_1, markershape=:square,markerstrokecolor = color_1,lw=0.0,markersize=M_SIZE)
-    plot!(fig,x[tpmax] .+ (x[tpmax] .- x[bw_interval]),avg_Im[bw_interval],
-    label= false,color=color_2, markershape=:square,markerstrokecolor = color_2,lw=0.0,markersize=M_SIZE)
-
-    if save
-        savefig(fig, string("Imgs/",fig_name,".pdf"))
-    end
-    display(fig)
-end 
-
-
 ## PLOT Eucledian CORR0T
 function plot_eucledian_corr0t(corr0t_Re, corr0t_Im, CC; true_solution=0,
             save=false,fig_name="eucledian_corrx0xt")
-    color_1 = 1
-    color_2 = 2
-    color_3 = "black"
 
     x = -1 .* imag(CC)
     fig = plot(xlabel=L"$\xi$", ylabel=true ? "" : L"$\langle \phi(0)\phi(\xi) \rangle - \langle \phi(0) \rangle \langle\phi(\xi) \rangle$";
@@ -266,8 +180,8 @@ function plot_eucledian_corr0t(corr0t_Re, corr0t_Im, CC; true_solution=0,
     display(fig)
 end
 
-## PLOT Eucledian CORR0T
-function plot_t_param_corr0t(corr0t_Re, corr0t_Im, tp; true_solution=0)
+## PLOT corr0t along the xi contour parmeter
+function plot_xi_param_corr0t(corr0t_Re, corr0t_Im, tp; true_solution=0)
     fig = plot(legend=:bottomright)#,ylim=[-0.3,0.4])
     #plot!(true_solution["x"],true_solution["corr0tRe"],label="ScroSol Re")
     #plot!(fig,true_solution["x"],true_solution["corr0tIm"],label="ScroSol Im")
@@ -276,8 +190,8 @@ function plot_t_param_corr0t(corr0t_Re, corr0t_Im, tp; true_solution=0)
 end
 
 
-## PLOT AVG and AVG
-function plot_eucledian_avg(avg_Re, avg_Im, avg2_Re, avg2_Im, tp; true_solution=0,save=false,fig_name="param_corrx")
+## PLOT AVG and AVG2
+function plot_avg_avg2(avg_Re, avg_Im, avg2_Re, avg2_Im, tp; true_solution=0,save=false,fig_name="param_corrx")
 
     fig = plot(xlabel=L"$\xi$"; plot_setup...)#,ylim=[-0.02,0.325])
 
@@ -299,8 +213,7 @@ end
 
 
 ## PLOT AVG and AVG
-function plot_eucledian_avg_nonEquil(avg_Re, avg_Im, avg2_Re, avg2_Im, CC; true_solution=0,save=false,fig_name="param_corrx")
-
+function plot_avg_avg2_nonEquil(avg_Re, avg_Im, avg2_Re, avg2_Im, CC; true_solution=0,save=false,fig_name="param_corrx")
 
     x = real(CC)
     tpmax = argmax(x)
