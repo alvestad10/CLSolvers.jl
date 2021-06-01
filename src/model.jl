@@ -156,47 +156,6 @@ function get_sde_funcs(::Imag_Sig_Lmd_Param)
 end
 
 
-##################
-####### AHO ######
-##################
-"""
-    Returns the a term in the SDE for the AHO model
-"""
-function a_AHO_real(du,u,param,t)
-    
-
-    p = param.p
-    a = param.a
-
-    xR, xI, xR_diff_i, xR_diff_pi, xI_diff_i, xI_diff_pi = param.vals
-    a_m1, a_p1, _ = param.as
-
-    xR =  @view u[1:div(end,2)]
-    xI =  @view u[div(end,2)+1:end]
-
-    xR_diff_i  = xR .- xR[vcat(end,1:end-1)]#circshift(xR,1)
-    xR_diff_pi = xR[vcat(2:end,1)] .- xR
-    xI_diff_i  = xI .- xI[vcat(end,1:end-1)]#circshift(xI,1)
-    xI_diff_pi = xI[vcat(2:end,1)] .- xI
-
-    preFac = (1.0 ./ (0.5.*(abs.(a) + abs.(a_m1))) ) .* 0.5
-
-    du[1:div(end,2)] .= - preFac .* (
-        2. .* p.g .*( real.(a_m1).*xI_diff_i  .- imag.(a_m1).*xR_diff_i ) ./ abs.(a_m1).^2
-     .- 2. .* p.g .*( real.(a)  .* xI_diff_pi .- imag.(a)  .* xR_diff_pi )./ abs.(a).^2
-     .- real.(a_m1 .+ a) .* (p.m.*xI .+ (1/6)*p.λ .* (-(xI.^3) .+ 3xI.*(xR.^2))) 
-     .- imag.(a_m1 .+ a) .* (p.m.*xR .+ (1/6)*p.λ .* (xR.^3 .- 3xR.*(xI.^2))) 
-     #.+ 1e-8
-    )
-
-    du[div(end,2)+1:end] .= preFac .* (
-        2. .* p.g .* (real.(a_m1).*xR_diff_i .+ imag.(a_m1).*xI_diff_i) ./ abs.(a_m1).^2
-     .- 2. .* p.g .* (real.(a).*xR_diff_pi   .+ imag.(a).*xI_diff_pi) ./ abs.(a).^2
-     .- real.(a_m1 .+ a) .* (p.m.*xR .+ (1/6)*p.λ .* ((xR.^3) .- 3xR.*(xI.^2))) 
-     .+ imag.(a_m1 .+ a) .* (p.m.*xI .+ (1/6)*p.λ .* (-xI.^3 .+ 3xI.*(xR.^2))) 
-    )
-end
-
 ####################################
 #######  AHO Non-Equilibrium  ######
 ####################################
@@ -343,6 +302,49 @@ function get_sde_funcs(::NonEquil_AHO_Param)
     return a_AHO_real_nonEquil, b_AHO_real_nonEquil, nothing
 end
 
+
+##################
+####### AHO ######
+##################
+"""
+    Returns the a term in the SDE for the AHO model
+"""
+function a_AHO_real(du,u,param,t)
+    
+
+    p = param.p
+    a = param.a
+
+    xR, xI, xR_diff_i, xR_diff_pi, xI_diff_i, xI_diff_pi = param.vals
+    a_m1, a_p1, _ = param.as
+
+    xR =  @view u[1:div(end,2)]
+    xI =  @view u[div(end,2)+1:end]
+
+    xR_diff_i  = xR .- xR[vcat(end,1:end-1)]#circshift(xR,1)
+    xR_diff_pi = xR[vcat(2:end,1)] .- xR
+    xI_diff_i  = xI .- xI[vcat(end,1:end-1)]#circshift(xI,1)
+    xI_diff_pi = xI[vcat(2:end,1)] .- xI
+
+    preFac = (1.0 ./ (0.5.*(abs.(a) + abs.(a_m1))) ) .* 0.5
+
+    du[1:div(end,2)] .= - preFac .* (
+        2. .* p.g .*( real.(a_m1).*xI_diff_i  .- imag.(a_m1).*xR_diff_i ) ./ abs.(a_m1).^2
+     .- 2. .* p.g .*( real.(a)  .* xI_diff_pi .- imag.(a)  .* xR_diff_pi )./ abs.(a).^2
+     .- real.(a_m1 .+ a) .* (p.m.*xI .+ (1/6)*p.λ .* (-(xI.^3) .+ 3xI.*(xR.^2))) 
+     .- imag.(a_m1 .+ a) .* (p.m.*xR .+ (1/6)*p.λ .* (xR.^3 .- 3xR.*(xI.^2))) 
+     #.+ 1e-8
+    )
+
+    du[div(end,2)+1:end] .= preFac .* (
+        2. .* p.g .* (real.(a_m1).*xR_diff_i .+ imag.(a_m1).*xI_diff_i) ./ abs.(a_m1).^2
+     .- 2. .* p.g .* (real.(a).*xR_diff_pi   .+ imag.(a).*xI_diff_pi) ./ abs.(a).^2
+     .- real.(a_m1 .+ a) .* (p.m.*xR .+ (1/6)*p.λ .* ((xR.^3) .- 3xR.*(xI.^2))) 
+     .+ imag.(a_m1 .+ a) .* (p.m.*xI .+ (1/6)*p.λ .* (-xI.^3 .+ 3xI.*(xR.^2))) 
+    )
+end
+
+
 """
     Returns the jacobian of the a term in the SDE for the AHO model
 """
@@ -437,131 +439,4 @@ end
 
 function get_sde_funcs(::AHO_Param)
     return a_AHO_real, b_AHO_real, jac_AHO_real
-end
-
-
-
-"""
-    Returns the derivative of the action for the AHO model 
-"""
-function get_D_action(x,a,p::AHO_Param)
-    return 0.5 * (
-            2. * p.g .* (x - circshift(x,1)) ./ circshift(a,1)
-         .- 2. * p.g .* (circshift(x,-1) - x) ./ a
-         .- (circshift(a,-1) .+ a) .* (p.m.*x .+ (1/6)*p.λ .* x.^3) 
-    )
-end
-
-"""
-    Returns the second derivative of the action 
-    for the AHO model 
-
-    Arguments:
-        x: field position 
-        a: time-point spacing
-        p: Model parameters
-"""
-function get_DD_action(x,a,p::AHO_Param)
-    return  0.5 * (
-            2. * p.g ./ circshift(a,1)
-         .+ 2. * p.g ./ a
-         .- (circshift(a,-1) .+ a) .* (p.m .+ (1/2)*p.λ .* x.^2) 
-    )
-end
-
-"""
-    Returns the second derivative at i and i+1 
-    of the action for the AHO model 
-    
-    Arguments:
-        x: field position 
-        a: time-point spacing
-        p: Model parameters
-"""
-function get_DDp_action(x,a,p::AHO_Param)
-    return 0.5 * (
-                -2. * p.g ./ a
-    )
-end
-
-"""
-    Returns the second derivative at i and i-1 
-    of the action for the AHO model
-    
-    Arguments:
-        x: field position 
-        a: time-point spacing
-        p: Model parameters
-"""
-function get_DDn_action(x,a,p::AHO_Param)
-    return 0.5 * (
-                -2. * p.g ./ circshift(a,1)
-    )
-end
-
-"""
-    Returns the third derivative of the action
-    for the AHO model
-    
-    Arguments:
-        x: field position 
-        a: time-point spacing
-        p: Model parameters
-"""
-function get_DDD_action(x,a,p::AHO_Param)
-    return 0.5 * (
-            -(circshift(a,-1) .+ a) .* (p.λ .* x) 
-    )
-end
-
-#### Define the Jacobian #####
-"""
-    Returns the Jacobian of the derivate of the action.
-    This is for the AHO model
-    
-    Arguments:
-        x: field position 
-        a: time-point spacing
-        p: Model parameters
-"""
-function get_Jacobian_D_action(x,a, p::AHO_Param)
-    DDn = get_DDn_action(x,a,p)
-    DD = get_DD_action(x,a,p)
-    DDp = get_DDp_action(x,a,p)
-    TD = Tridiagonal(DDn[2:end], DD, DDp[1:end-1])  
-    return Matrix(TD + sparse([1,length(DDp)],[length(DDn),1],[DDn[1],DDp[end]]))
-end
-
-
-### LM_HO ###
-
-function get_action(x,a,p::LM_HO_Param)
-    return  sum( a.* ( 0.5*p.m .* x .* x) )
-end
-
-function get_action(x,a,p::LM_AHO_Param)
-    return  sum( a .* ( 0.5*p.m .* x.^2 + (1/24) * p.λ .* x.^4) )
-end
-
-function get_D_action(x,a, p::LM_HO_Param)
-    return - a .* ( p.m .* x)
-end
-
-### LM_AHO ###
-
-function get_D_action(x,a, p::LM_AHO_Param)
-    return  - a .* ( p.m .* x  +  (1/6)*p.λ .* x.^3)
-end
-
-#function get_D_action(x, a, p::LM_AHO_Param)
-#    return  - imag(a) * ( p.m * x  +  (1/6)*p.λ * x^3)
-#end
-
-function get_DD_action(x,a,p::LM_AHO_Param)
-    return - a .* ( p.m   .+  (1/2)*p.λ .* x.^2)
-end
-
-#### Define the Jacobian #####
-function get_Jacobian_D_action(x,a, p::LM_AHO_Param)
-    return Diagonal(get_DD_action(x,a,p))
 end
