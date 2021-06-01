@@ -1,5 +1,7 @@
 # CLSolvers.jl
 
+[![DOI](https://zenodo.org/badge/372485108.svg)](https://zenodo.org/badge/latestdoi/372485108)
+
 This is the code generating the simulations done in: https://arxiv.org/abs/2105.02735
 
 To run the code you need a version of Julia installed, then you can make separate scripts or
