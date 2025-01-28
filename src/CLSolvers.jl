@@ -3,13 +3,10 @@ module CLSolvers
 using LinearAlgebra
 using Random
 using Distributions
-#using CUDA
-using LinearAlgebra
 using SparseArrays
-using ForwardDiff
 using ShiftedArrays, LabelledArrays
 
-using DocStringExtensions
+# using DocStringExtensions
 
 
 include("model.jl")
