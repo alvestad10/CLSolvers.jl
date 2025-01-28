@@ -76,7 +76,7 @@ ensemble_prob = EnsembleProblem(prob_sde2,prob_func=prob_func)
             progress = true, saveat = 0.01, save_start = false, 
             dtmax=args.dtmax, dt=args.dt,
             adaptive=args.adaptive,
-            abstol=args.tol,reltol=args.tol,maxiter=10^6)
+            abstol=args.tol,reltol=args.tol,maxiters=10^6)
 
 # Compute the observables
 avg_Re, avg_Im, avg2_Re, avg2_Im, corr0t_Re, corr0t_Im, corr0t_2_Re, corr0t_2_Im, corrt0_Re, corrt0_Im = get_statistics(sol)
